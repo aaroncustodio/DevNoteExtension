@@ -4,7 +4,6 @@ var clickEnabled = true;
 
 // open main window
 function openPanel(tab) {
-
     let contentWindowId = tab.windowId;
     if (master[contentWindowId] != undefined) {
         browser.windows.update(master[contentWindowId], {
@@ -17,6 +16,12 @@ function openPanel(tab) {
     } else if (!clickEnabled) {
         return;
     }
+    // chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    //     var frame = document.createElement('iframe');
+    //     frame.src = 'panel/index.html';
+    //     chrome.tabs.sendMessage(tabs[0].id, { clicked: browserActionClicked, extensionUrl: frame.src });
+    //     browserActionClicked = true;
+    // });
 
     clickEnabled = false;
     setTimeout(function() {
@@ -29,7 +34,8 @@ function openPanel(tab) {
             url: browser.runtime.getURL("panel/index.html"),
             type: "popup",
             height: height,
-            width: width
+            width: width,
+            focused: false
         }).then(function waitForPanelLoaded(panelWindowInfo) {
             return new Promise(function(resolve, reject) {
                 let count = 0;
@@ -71,6 +77,8 @@ function openPanel(tab) {
     // get previous window size, and open the window
     getWindowSize(f);
 }
+// flag that indicates if the extension icon is clicked at least once
+var browserActionClicked = false;
 
 browser.browserAction.onClicked.addListener(openPanel);
 
